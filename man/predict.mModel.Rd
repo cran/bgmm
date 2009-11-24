@@ -11,7 +11,7 @@ predict.mModel(object, X, knowns = NULL, B = NULL, P = NULL, ...)
 }
 \arguments{
   \item{object}{an object of the class \code{mModel},   }
-  \item{X}{a \code{matrix} or \code{data.frame} in  witch number of columns is equal to \code{object$d}.   }
+  \item{X}{a \code{matrix} or \code{data.frame} in which number of columns is equal to \code{object$d}.   }
   \item{knowns}{a \code{data.frame} or \code{matrix} with the labeled observations. If the argument \code{knowns} is specified then eighter \code{B} or \code{P} need to be specified. }
   \item{P}{a matrix with plausibilities for object \code{knowns}. }
   \item{B}{a matrix with beliefs for object \code{knowns}. }

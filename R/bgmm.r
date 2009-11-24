@@ -46,7 +46,7 @@ predict.mModel <- function(object, X, knowns=NULL, B=NULL, P=NULL, ...) {
 }
 
 
-supervised <- function(knowns, class=NULL, k=length(unique(class)), B=NULL, P=NULL, model.structure=getModelStructure()) {
+supervised <- function(knowns, class=NULL, k=length(unique(class)), B=NULL, P=NULL, model.structure=getModelStructure(), ...) {
   if (is.null(dim(knowns)) || is.data.frame(knowns)) knowns = as.matrix(knowns)
   if (is.null(class)) {
     if (!is.null(B)) {
@@ -97,6 +97,12 @@ supervised <- function(knowns, class=NULL, k=length(unique(class)), B=NULL, P=NU
   result$knowns = knowns
   result$class = class
   class(result) = c("supervisedModel", "mModel")
+  if (!is.null(colnames(knowns))) {
+      dimnames(result$cvar) = list(NULL, colnames(knowns), colnames(knowns))
+  }
+  
+  result$dof = getDFinternal(result)
+  
   result
 }
 
@@ -153,8 +159,16 @@ belief <- function(X, knowns, B=NULL, k=ifelse(!is.null(B),ncol(B),ifelse(!is.nu
   result$X = X
   result$knowns = knowns
   result$B = B
-#  result$likelihood = loglikelihood.mModel(result, X)
   result$model.structure = model.structure
+  if (!is.null(colnames(X))) {
+      dimnames(result$cvar) = list(NULL, colnames(X), colnames(X))
+  }
+  if (!is.null(colnames(knowns))) {
+      dimnames(result$cvar) = list(NULL, colnames(knowns), colnames(knowns))
+  }
+
+  result$dof = getDFinternal(result)
+
   class(result) = c("beliefModel", "mModel")
   result
 }
@@ -198,7 +212,7 @@ belief.internal <- function(X, model.params, model.structure, stop.likelihood.ch
     if (stopP)
           break
     if (trace) {
-      cat("step:          ", n.steps, "\n params:   ", paste(paste(model.params$mu, collapse=","),paste(model.params$cvar, collapse=","),paste(model.params$pi, collapse=","),sep=":"), "\n likelihood:   ", tmp$log.likelihood, "\n change:       ", tmp$log.likelihood - prev.likelihood, "\n\n")
+      cat("step:          ", n.steps, "\n likelihood:   ", tmp$log.likelihood, "\n change:       ", tmp$log.likelihood - prev.likelihood, "\n\n")
     }
     if ((abs(tmp$log.likelihood - prev.likelihood)/ifelse(is.infinite(prev.likelihood), 1,  (1+abs(prev.likelihood))) < stop.likelihood.change) || 
         (n.steps >= stop.max.nsteps)) {
@@ -207,8 +221,10 @@ belief.internal <- function(X, model.params, model.structure, stop.likelihood.ch
       }
     prev.likelihood = tmp$log.likelihood
   }
+  
   model.params$likelihood = prev.likelihood
   model.params$n.steps = n.steps
+  model.params$tik = tmp$tik
   model.params
 }
 
@@ -226,7 +242,7 @@ map = get.labels.from.beliefs
 
 determinant.numeric <- function (x, logarithm = TRUE, ...) {list(modulus = ifelse(logarithm,log(x),x), sign=sign(x))}
 
-loglikelihood.mModel <- function(model, X) {
+fij.mModel <- function(model, X) {
   # densities for all components
   lfik <- matrix(0, nrow(X), model$k)
   for (i in 1:model$k) {
@@ -239,20 +255,45 @@ loglikelihood.mModel <- function(model, X) {
         lfik[,i] <-   dnorm(X, model$mu[i,,drop=F], sqrt(model$cvar[i,,]), log=T)
        }
   }
-  fb.ik = exp(lfik + repeat.rows(log(model$pi), nrow(X)))
-  sum(log(rowSums(fb.ik)))
+  exp(lfik + repeat.rows(log(model$pi), nrow(X)))
+#  fb.ik
+}
+
+loglikelihood.mModel <- function(model, X) {
+  sum(log(rowSums(fij.mModel(model, X))))
 }
 
 
+#
+# ICs
+#
 
 getGIC <- function(model, p=2) {
-  if (p=="AIC") p = 2
-  if (p=="BIC") p = log(max(model$n - model$m,1))
- -2*loglikelihood.mModel(model, model$X) + getDF(model)*p
+  tmpDF = getDF(model)
+  fij   = fij.mModel(model, model$X)
+  if ("numeric" %in% class(p)) return (-2*sum(log(rowSums(fij))) +  p * tmpDF)
+  n     = max(model$n - model$m,1)
+  penalty = 0
+  if ("character" %in% class(p)) 
+      penalty = switch(p, 
+          AIC     =  2 * tmpDF,
+          AIC3    =  3 * tmpDF,
+          AIC4    =  4 * tmpDF,
+          AICc    = 2 * tmpDF + 2 * tmpDF * (tmpDF + 1) / (max(n - tmpDF - 1,1)),
+          AICu    = 2 * tmpDF + 2 * tmpDF * (tmpDF + 1) / (max(n - tmpDF - 1,1)) + n * log(n/max(n - tmpDF - 1,1)),
+          CAIC    = tmpDF * (1 + log(n)),
+          BIC     = log(n) * tmpDF,
+          MDL     = log(n) * tmpDF,
+          CLC     = 2 * getEntropy(fij), 
+          ICLBIC  = log(n) * tmpDF + 2 * getEntropy(fij),
+          AWE     = 2 * tmpDF * (3/2 + log(n)),
+          stop("getGIC: unkown penalty description"))
+  
+ -2*sum(log(rowSums(fij))) + penalty
 }
 
 # degress of fredom
-getDF <- function(model) {
+getDFinternal <- function(model) {
   k = model$k
   d = model$d
   ifelse(model$model.structure$mean=="D", k*d, d) + # mean value
@@ -261,6 +302,18 @@ getDF <- function(model) {
                      ifelse(model$model.structure$cov=="0", 0, 1)*ifelse(model$model.structure$between=="D", d*(d-1)/2, 1) ) # covariances
 }
 
+getDF <- function(model) {
+  if (is.null(model$dof)) {
+      return(getDFinternal(model))
+  } 
+  model$dof
+}
+
+getEntropy <- function(matr) {
+  matr <- matr*log(matr)
+  matr[is.nan(matr)] = 0
+  -sum(matr)
+}
 
 chooseModels <- function(models, kList = NULL, struct = NULL) {
    if (!is.null(struct)) {  
@@ -285,9 +338,57 @@ chooseModels <- function(models, kList = NULL, struct = NULL) {
 }
 
 
+
 chooseOptimal <- function(models, penalty=2) {
    values = sapply(models$models, getGIC, p=penalty)
-   models$models[[which.max(values)[1]]] 
+   models$models[[which.min(values)[1]]] 
+}
+
+
+
+crossval <- function(model=NULL, X=NULL, knowns=NULL, class=NULL, k=length(unique(class)),B=NULL,P=NULL, model.structure=getModelStructure(), ..., folds = 2, fun=belief) {
+   if (!is.null(model)) {
+      X = model$X
+      knowns = model$knowns
+      class = model$class
+      B = model$B
+      P = model$P
+      k = model$k
+      model.structure = model$model.structure
+   }
+   if (is.null(knowns)) {
+      stop("Argument knowns has to be specified")
+   }
+   if (!is.data.frame(knowns) && !is.matrix(knowns)) {
+      stop("Argument knowns has to be of the class matrix or data frame")
+   }
+   if (nrow(knowns) < folds) {
+      stop("Number of folds cannot be greater than number of known cases")
+   }
+   m = nrow(knowns)
+   n = nrow(X)
+   indKnowns = sample(rep(1:folds, length.out=m))
+   indX      = sample(rep(1:folds, length.out=n))
+   errors = numeric(folds)
+   for (i in 1:folds) {
+       indX1 = which(indX==i)
+       indX2 = which(indX!=i)
+       indK1 = which(indKnowns==i)
+       indK2 = which(indKnowns!=i)
+       
+       modelTmp = fun(X = X[indX2,,drop=F], knowns = knowns[indK2,,drop=F], class=class[indK2], k=k, B=B[indK2,,drop=F], P=P[indK2,,drop=F], model.structure=model.structure, ...)
+       predTmp  = predict(modelTmp, knowns[indK1,,drop=F])
+       if (!is.null(class)) {
+           errors[i] = mean(class[indK1,drop=F] != predTmp$class.X)
+       } else {
+         if (!is.null(B)) {
+           errors[i] = mean(abs(B[indK1,,drop=F] - predTmp$tij.X))
+         } else {
+           errors[i] = mean(abs(P[indK1,,drop=F] - predTmp$tij.X))
+         }
+       }
+   }
+   list(errors=errors, indKnowns=indKnowns, indX=indX)
 }
 
 

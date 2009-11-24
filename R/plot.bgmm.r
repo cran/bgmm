@@ -1,6 +1,6 @@
 plot.mModel <- function(x, ...) {
-  if (x$d > 2) 
-    stop("PLOT SUPPORTS ONLY 1D and 2D data")
+#  if (x$d > 2) 
+#    stop("PLOT SUPPORTS ONLY 1D and 2D data")
 
    map.class = NULL
    if (!is.null(x$class))
@@ -13,14 +13,28 @@ plot.mModel <- function(x, ...) {
        map.class = NULL
    }
 
-  if (x$d==1) 
+  if (x$d == 1) 
     plot.1d(x$X, x$knowns, map.class, x, ...)
-  if (x$d==2) 
+  if (x$d > 1) 
     plot.2d(x$X, x$knowns, map.class, x, ...)
 }
 
 
 plot.2d <-function(X, knowns, map.class, bgmm2d, ...) {
+  if (bgmm2d$d > 2) {
+      tmp     <- prcomp(rbind(X, knowns))
+      bgmm2d$mu<- data.frame(bgmm2d$mu)
+      colnames(bgmm2d$mu) = colnames(X)
+      X       <- predict(tmp, X)[,1:2]
+      knowns  <- predict(tmp, knowns)[,1:2]
+      bgmm2d$mu<- predict(tmp, bgmm2d$mu)[,1:2]
+      B       <- tmp$rotation[,1:2]
+      cvar = array(0,dim=c(bgmm2d$k,2,2))
+      for (i in 1:(bgmm2d$k)) 
+          cvar[i,,] <- t(B) %*% bgmm2d$cvar[1,,] %*% B
+      bgmm2d$cvar <- cvar
+   }
+
    Xk = rbind(X, knowns)
    
    plot(Xk, type="n", ...)

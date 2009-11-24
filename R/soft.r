@@ -22,7 +22,6 @@ soft <- function(X, knowns, P=NULL, k=ifelse(!is.null(P),ncol(P),ifelse(!is.null
   init.params$n = nrow(knowns) + nrow(X)
   init.params$k = k
   init.params$d = ncol(X)
-#  result = soft.internal(rbind(knowns, X), init.params, model.structure, stop.likelihood.change=stop.likelihood.change, stop.max.nsteps=stop.max.nsteps, trace=trace)
   result = bgmm.internal(internal.funct=soft.internal, X=rbind(knowns, X), init.params=init.params, model.structure=model.structure, stop.likelihood.change=stop.likelihood.change, stop.max.nsteps=stop.max.nsteps, trace=trace, all.possible.permutations=all.possible.permutations)
 
   result$likelihood = result$likelihood           #loglikelihood.mModel(result, X)
@@ -31,6 +30,15 @@ soft <- function(X, knowns, P=NULL, k=ifelse(!is.null(P),ncol(P),ifelse(!is.null
   result$model.structure = model.structure
   result$B = B
   class(result) = c("softModel", "mModel")
+  if (!is.null(colnames(X))) {
+      dimnames(result$cvar) = list(NULL, colnames(X), colnames(X))
+  }
+  if (!is.null(colnames(knowns))) {
+      dimnames(result$cvar) = list(NULL, colnames(knowns), colnames(knowns))
+  }
+  
+  result$dof = getDFinternal(result)
+
   result
 }
 
@@ -56,20 +64,9 @@ soft.internal <- function(X, model.params, model.structure, stop.likelihood.chan
   }
   model.params$likelihood = prev.likelihood
   model.params$n.steps = n.steps
+  model.params$tik = tmp$tik
   model.params
 }
-
-#
-#unsupervised <- function(X, k, ...) {
-#  if (is.null(dim(X))) X = as.matrix(X)
-#  result = soft(X[-1,,drop=F], X[1,,drop=F], matrix(1,1,k), k=k, ...) 
-#  result$X = X
-#  result$k = k
-#  result$knowns = NULL
-#  class(result) = c("unsupervisedModel", "softModel", "mModel")
-#  result
-#}
-#
 
 unsupervised <- function(X, k, init.params=init.model.params(X, knowns=NULL, k=k), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE) {
   if (is.null(dim(X)) || is.data.frame(X)) X = as.matrix(X)
@@ -85,6 +82,12 @@ unsupervised <- function(X, k, init.params=init.model.params(X, knowns=NULL, k=k
   result$model.structure = model.structure
   result$B = NULL
   class(result) = c("softModel", "mModel")
+  if (!is.null(colnames(X))) {
+      dimnames(result$cvar) = list(NULL, colnames(X), colnames(X))
+  }
+
+  result$dof = getDFinternal(result)
+
   result
 }
 

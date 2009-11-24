@@ -13,6 +13,7 @@ export(
 
    # plot single model or list of models
    plot.mModel, plotGIC, plot.mModelList,
+   getGIC, getDF, crossval,
 
    # utils
    map, loglikelihood.mModel, 

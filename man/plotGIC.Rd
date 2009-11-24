@@ -1,19 +1,29 @@
 \name{plotGIC}
 \alias{plotGIC}
+\alias{getGIC}
+\alias{getDF}
 \title{
 Plotting GIC scores 
 }
 \description{
-The function \code{plotGIC()} plots the GIC scores for an input collection of models.
+The function \code{plotGIC()} plots the GIC scores for an input collection of models. The function \code{getGIC()} extracts GIC for given model and penalty function. The function \code{getDF()} extracts the number of degree of freedom for model parameters.
 }
 \usage{
 plotGIC(models, penalty = 2, plot.it = TRUE)
+
+getGIC(model, p = 2)
+
+getDF(model)
 }
 
 \arguments{
   \item{models}{an object of the class \code{mModelList} or a matrix of GIC scores.
   }
-  \item{penalty}{a penalty for the GIC criteria. This parameter can be a single number or a string, either "BIC" or "AIC".     
+  \item{model}{an object of the class \code{mModel}.
+  }
+  \item{penalty}{a penalty for the GIC criteria. This parameter can be a single number or a string, on of the "BIC", "AIC", "AIC3", "AIC4", "AICc", "AICu", "CAIC", "BIC", "MDL", "CLC", "ICL-BIC", "AWE".     
+  }
+  \item{p}{same as \code{penalty},  
   }
   \item{plot.it}{a logical value, if \code{TRUE} then the chart with the GIC scores will be plotted.
   }

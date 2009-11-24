@@ -41,11 +41,11 @@ plot.mModelList <- function(x, ...) {
   X = x$models[[1]]$X
   knowns = x$models[[1]]$knowns
   B = x$models[[1]]$B
-  if (d > 2) 
-    stop("PLOT SUPPORTS ONLY 1D and 2D data")
+#  if (d > 2) 
+#    stop("PLOT SUPPORTS ONLY 1D and 2D data")
   if (d==1) 
     plotList.1d(X, knowns, B, x, ...)
-  if (d==2) 
+  if (d > 1) 
     plotList.2d (X, knowns, B, x, ...)
 }
 

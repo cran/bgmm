@@ -34,7 +34,7 @@ semisupervised(X, knowns, class = NULL, k = ifelse(!is.null(class),
     B = NULL, P = NULL, ..., 
 	all.possible.permutations=FALSE)    
     
-supervised(knowns, class = NULL, k = length(unique(class)), B = NULL, P = NULL, model.structure = getModelStructure())
+supervised(knowns, class = NULL, k = length(unique(class)), B = NULL, P = NULL, model.structure = getModelStructure(), ...)
 
 unsupervised(X, k, init.params=init.model.params(X, knowns=NULL, k=k), 
       model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, 
