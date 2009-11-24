@@ -34,7 +34,7 @@ init.model.params.knowns <- function(knowns, class, k, d) {
   list(pi = pro, mu = mu, cvar = cvar)
 }
 
-init.model.params <- function(X=NULL, knowns=NULL, class=NULL, k=length(unique(class)), method = "all", B=P, P=NULL, clusterAssigment=TRUE) {
+init.model.params <- function(X=NULL, knowns=NULL, class=NULL, k=length(unique(class)), method = "all", B=P, P=NULL) {
  d=1
  if (is.null(dim(X)) & !is.null(X))                 {X = as.matrix(X); d=1}
  if (is.null(dim(knowns)) & !is.null(knowns))       {knowns = as.matrix(knowns); d = 1}
@@ -46,7 +46,6 @@ init.model.params <- function(X=NULL, knowns=NULL, class=NULL, k=length(unique(c
  if (class(class) == "factor")   class = as.numeric(class)
  if (method == "knowns") {
      model.params = init.model.params.knowns(knowns, class, k, d)
-	 clusterAssigment = FALSE
 	 # if there is not enough labeled cases just cast an error
 	 nmis = sum(is.na(model.params$mu))
 	 if (nmis > 0) 		stop("If method='knowns' then labeled cases for all components should be given.")
@@ -73,11 +72,10 @@ init.model.params <- function(X=NULL, knowns=NULL, class=NULL, k=length(unique(c
       } 
       model.params = list(pi = pro, mu = mu, cvar = cvar)
     }
- }
- 
- if (clusterAssigment & !is.null(knowns) & !is.null(class)) {
-   clParams     = bgmm:::clusterAssigmentMeans(knowns, class, model.params$mu)
-   model.params = permute.model.params(model.params, clParams$li)
+    if (!is.null(knowns) & !is.null(class)) {
+       clParams     = bgmm:::clusterAssigmentMeans(knowns, class, model.params$mu)
+       model.params = permute.model.params(model.params, clParams$li)
+    }
  }
  
  model.params

@@ -1,4 +1,4 @@
-soft <- function(X, knowns, P=NULL, k=ifelse(!is.null(P),ncol(P),ifelse(!is.null(B),ncol(B),length(unique(class)))), B=NULL, class=NULL, init.params=init.model.params(X, knowns, class=class, B=P, k=k, clusterAssigment=clusterAssigment), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE, clusterAssigment=TRUE, b.min=0.025, all.possible.permutations=FALSE) {
+soft <- function(X, knowns, P=NULL, k=ifelse(!is.null(P),ncol(P),ifelse(!is.null(B),ncol(B),length(unique(class)))), B=NULL, class=NULL, init.params=init.model.params(X, knowns, class=class, B=P, k=k), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE, b.min=0.025, all.possible.permutations=FALSE) {
   if (is.null(dim(knowns)) || is.data.frame(knowns)) knowns = as.matrix(knowns)
   if (is.null(dim(X)) || is.data.frame(X)) X = as.matrix(X)
   if (is.null(P)) {
@@ -60,9 +60,9 @@ soft.internal <- function(X, model.params, model.structure, stop.likelihood.chan
 }
 
 #
-#unsupervised <- function(X, k, ..., clusterAssigment=FALSE) {
+#unsupervised <- function(X, k, ...) {
 #  if (is.null(dim(X))) X = as.matrix(X)
-#  result = soft(X[-1,,drop=F], X[1,,drop=F], matrix(1,1,k), k=k, ..., clusterAssigment=F) 
+#  result = soft(X[-1,,drop=F], X[1,,drop=F], matrix(1,1,k), k=k, ...) 
 #  result$X = X
 #  result$k = k
 #  result$knowns = NULL
@@ -71,7 +71,7 @@ soft.internal <- function(X, model.params, model.structure, stop.likelihood.chan
 #}
 #
 
-unsupervised <- function(X, k, init.params=init.model.params(X, knowns=NULL, k=k, clusterAssigment=FALSE), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE, clusterAssigment=FALSE) {
+unsupervised <- function(X, k, init.params=init.model.params(X, knowns=NULL, k=k), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE) {
   if (is.null(dim(X)) || is.data.frame(X)) X = as.matrix(X)
   init.params$P = NULL
   init.params$m = 0

@@ -30,11 +30,23 @@ predict.mModel <- function(object, X, knowns=NULL, B=NULL, P=NULL, ...) {
 #        b.pi[nrow(X) - (nrow(knowns):1) +1,] = P * b.pi[nrow(X) - (nrow(knowns):0),]
 
   tik =  t(apply(fik * b.pi, 1, normalize))
-  list(tij = tik, class=get.labels.from.beliefs(tik))
+  class = get.labels.from.beliefs(tik)
+  # return predictions as two separate slots
+  tij.knowns = NULL
+  tij.X = tik
+  class.knowns = NULL
+  class.X = class
+  if (!is.null(P) | !is.null(B)) {
+     tij.knowns = tik[1:nrow(knowns),,drop=F]
+     tij.X = tik[-(1:nrow(knowns)),,drop=F]
+     class.knowns = class[1:nrow(knowns)]
+     class.X = class[-(1:nrow(knowns))]
+  }
+  list(tij.X=tij.X, tij.knowns = tij.knowns, class.X=class.X, class.knowns=class.knowns)
 }
 
 
-supervised <- function(knowns, class=NULL, k=length(unique(class)), B=NULL, P=NULL,clusterAssigment=TRUE, model.structure=getModelStructure()) {
+supervised <- function(knowns, class=NULL, k=length(unique(class)), B=NULL, P=NULL, model.structure=getModelStructure()) {
   if (is.null(dim(knowns)) || is.data.frame(knowns)) knowns = as.matrix(knowns)
   if (is.null(class)) {
     if (!is.null(B)) {
@@ -88,7 +100,7 @@ supervised <- function(knowns, class=NULL, k=length(unique(class)), B=NULL, P=NU
   result
 }
 
-semisupervised <- function(X, knowns, class=NULL, k=ifelse(!is.null(class),length(unique(class)),ifelse(!is.null(B),ncol(B),ncol(P))),B=NULL,P=NULL, ..., clusterAssigment=TRUE, all.possible.permutations=FALSE) {
+semisupervised <- function(X, knowns, class=NULL, k=ifelse(!is.null(class),length(unique(class)),ifelse(!is.null(B),ncol(B),ncol(P))),B=NULL,P=NULL, ...,  all.possible.permutations=FALSE) {
   if (is.null(dim(knowns)) || is.data.frame(knowns)) knowns = as.matrix(knowns)
   if (is.null(dim(X)) || is.data.frame(X)) X = as.matrix(X)
   if (is.null(class)) {
@@ -113,7 +125,7 @@ semisupervised <- function(X, knowns, class=NULL, k=ifelse(!is.null(class),lengt
   result
 }
 
-belief <- function(X, knowns, B=NULL, k=ifelse(!is.null(B),ncol(B),ifelse(!is.null(P),ncol(P),length(unique(class)))), P=NULL, class=map(B), init.params=init.model.params(X, knowns, B=B, P=P, class=class, k=k), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE, b.min=0.025, clusterAssigment=TRUE, all.possible.permutations=FALSE) {
+belief <- function(X, knowns, B=NULL, k=ifelse(!is.null(B),ncol(B),ifelse(!is.null(P),ncol(P),length(unique(class)))), P=NULL, class=map(B), init.params=init.model.params(X, knowns, B=B, P=P, class=class, k=k), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE, b.min=0.025,  all.possible.permutations=FALSE) {
   if (is.null(dim(knowns)) || is.data.frame(knowns)) knowns = as.matrix(knowns)
   if (is.null(dim(X)) || is.data.frame(X)) X = as.matrix(X)
   if (is.null(B)) {

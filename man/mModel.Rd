@@ -6,11 +6,11 @@
 \alias{supervised}
 \alias{unsupervised}
 \title{
-Gaussian mixture model fitting.
+Fitting Gaussian mixture model 
 }
 \description{
 These functions fit different variants of Gaussian mixture models. These variants 
-differ in the amount of knowledge incorporated into the fitting procedure.
+differ in the fraction of knowledge utilized into the the fitting procedure.
 }
 \usage{
 belief(X, knowns, B = NULL, k = ifelse(!is.null(B), ncol(B), 
@@ -18,85 +18,76 @@ belief(X, knowns, B = NULL, k = ifelse(!is.null(B), ncol(B),
     class = map(B), init.params = init.model.params(X, knowns, 
         B = B, P = P, class = class, k = k), model.structure = getModelStructure(), 
     stop.likelihood.change = 10^-5, stop.max.nsteps = 100, trace = FALSE, 
-    b.min = 0.025, clusterAssigment = TRUE, all.possible.permutations=FALSE)
+    b.min = 0.025, 
+    all.possible.permutations=FALSE)
     
 soft(X, knowns, P = NULL, k = ifelse(!is.null(P), ncol(P), 
     ifelse(!is.null(B), ncol(B), length(unique(class)))), B = NULL, 
     class = NULL, init.params = init.model.params(X, knowns, 
-        class = class, B = P, k = k, clusterAssigment = clusterAssigment), 
+        class = class, B = P, k = k), 
     model.structure = getModelStructure(), stop.likelihood.change = 10^-5, 
-    stop.max.nsteps = 100, trace = FALSE, clusterAssigment = TRUE, b.min = 0.025, 
+    stop.max.nsteps = 100, trace = FALSE, b.min = 0.025, 
 	all.possible.permutations=FALSE)    
     
 semisupervised(X, knowns, class = NULL, k = ifelse(!is.null(class), 
     length(unique(class)), ifelse(!is.null(B), ncol(B), ncol(P))), 
-    B = NULL, P = NULL, ..., clusterAssigment = TRUE, 
+    B = NULL, P = NULL, ..., 
 	all.possible.permutations=FALSE)    
     
-supervised(knowns, class = NULL, k = length(unique(class)), B = NULL, P = NULL,
-     clusterAssigment = TRUE, model.structure = getModelStructure())
+supervised(knowns, class = NULL, k = length(unique(class)), B = NULL, P = NULL, model.structure = getModelStructure())
 
-unsupervised(X, k, init.params=init.model.params(X, knowns=NULL, k=k, clusterAssigment=FALSE), 
+unsupervised(X, k, init.params=init.model.params(X, knowns=NULL, k=k), 
       model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, 
-      trace=FALSE, clusterAssigment=FALSE) 
+      trace=FALSE) 
 }
 
 \arguments{
-  \item{X}{A data.frame with unlabeled observations. Rows correspond to  observations and  columns to  dimensions of the data}
-  \item{knowns}{A data.frame with  labeled observations. Rows correspond to  observations and columns to  dimensions of the data}
-  \item{B}{A beliefs matrix with the distribution of beliefs for 
-  labeled observations. Rows of B correspond to  labeled
-  observations and are assumed to be given in the same order as in the
-  argument knowns. Columns correspond to model components.  }
-  \item{P}{A  matrix  with plausibilities, i.e., weights for prior
-  probabilities for labeled observations. }
-  \item{class}{A vector of classes for labeled observations}
-  \item{k}{Number of components, by default equal to the number of columns of B}
-  \item{init.params}{Initial values for model parameter estimates
-  (means, variances and mixing proportions), bu default derived with the
-  use of the \code{\link{init.model.params}} function}
-  \item{stop.likelihood.change, stop.max.nsteps}{Parameters for the EM
-  algorithms defining the stop criteria, i.e., the minimum required improvement in loglikelihood and the maximum number of steps}
-  \item{trace}{If trace=TRUE then loglikelihoods for every step of EM algorithm will be presented
-  }
-  \item{model.structure}{An object returned by the \code{\link{getModelStructure}} function, which defines the constraints for the parameters of the model to be fitted.}
-  \item{b.min}{This argument will be passed to function \code{\link{init.model.params}}  }
-  \item{\dots}{These arguments will be passed to function \code{\link{init.model.params}}    }
-  \item{clusterAssigment}{Parameter for the function init.model.params() which specifies if cluster labels should be agreed with knowns labels  }
-  \item{all.possible.permutations}{If TRUE then all possible permutations of initial parameters are considered, the resulting model is the model with highest likelihood.}
+  \item{X}{a data.frame with the unlabeled observations. The rows correspond to the observations while the columns to variables/dimensions of the data. }
+  \item{knowns}{a data.frame with the labeled observations. The rows correspond to the observations while the columns to variables/dimensions of the data. }
+  \item{B}{a beliefs matrix which specifies the distribution of beliefs for the labeled observations. The number of rows in B should equal the number of rows in the  data.frame \code{knowns}. It is assumed that both the observations in \code{B} and in \code{knowns} are given in the same order. Columns correspond to the model components. If matrix B is provided, the number of columns has to be less or equal \code{k}. Internally, the matrix \code{B} is completed to \code{k} columns.  }
+  \item{P}{a  matrix of plausibilities, i.e., weights of the prior probabilities for the labeled observations. If matrix \code{P} is provided, the number of columns has to be less or equal \code{k}. The came conditions as for \code{B} apply. }
+  \item{class}{a vector of classes/labels for the labeled observations. The number of its unique values has to be less or equal \code{k}. }
+  \item{k}{a number of components, by default equal to the number of columns of \code{B}. }
+  \item{init.params}{initial values for the estimates of the model parameters (means, variances and mixing proportions), by default derived with the
+  use of the \code{\link{init.model.params}} function. }
+  \item{stop.likelihood.change, stop.max.nsteps}{ the parameters for the EM algorithms defining the stop criteria, i.e., the minimum required improvement of loglikelihood and the maximum number of steps. }
+  \item{trace}{if \code{trace=TRUE} the loglikelihoods for every step of EM algorithm are printed out.   }
+  \item{model.structure}{an object returned by the \code{\link{getModelStructure}} function, which specifies constraints for the parameters of the model to be fitted. }
+  \item{b.min}{this argument is passed to the \code{\link{init.model.params}} function.  }
+  \item{\dots}{these arguments will be passed tothe \code{\link{init.model.params}} function.   }
+  \item{all.possible.permutations}{If equal \code{TRUE}, all possible initial parameters' permutations of components are considered. Since there is kList! permutations,  model fitting is repeated kList! times. As a result, only the model with the highest likelihood is returned.}
 }
 \details{
-  In the belief() function, if the argument B is not provided, it is
-  first set to the argument P. If the argument P is not
-  provided, B is derived from the class argument by function get.simple.beliefs() 
-  which assigns 1-(k-1)*b.min to the component corresponding to class argument and 
-  b.min to other components.
+  In the \code{belief()} function, if the argument \code{B} is not provided, it is
+  by default initialized from the argument \code{P}. If the argument \code{P} is not
+  provided, \code{B} is derived from the \code{class} argument with the use of the function \code{get.simple.beliefs()} 
+  which assigns \code{1-(k-1)*b.min} to the component given by \code{class}  and 
+  \code{b.min} to all remaining components.
 
-  In the soft() function, if the argument P is not provided, it is
-  first set to the argument B. If the argument B is not
-  provided, P is derived from the class argument as in the belief()
+  In the \code{soft()} function, if the argument \code{P} is not provided, it is
+  by default initialized from the argument \code{B}. If the argument \code{B} is not
+  provided, \code{P} is derived from the \code{class} argument as in the \code{belief()}
   function.
 
-  In the supervised() function,  if the argument class is not provided,
-  it is derived from argument B or P, taking the class of each
-  observation as its most believed or plausible component.
+  In the \code{supervised()} function,  if the argument \code{class} is not provided,
+  it is by default initialized from argument \code{B} or \code{P}, taking the label of each
+  observation as its most believed or plausible component (by the MAP rule).
   
-  The number of columns in the beliefs matrix B or in the matrix of
-  plausibilities P may be lower than the number of model components
-  defined by the argument k.  Such situation corresponds to the scenario
-  when the user does not know any examples of observations from some
-  component. In other words, this component is not used as a label for
+  The number of columns in the beliefs matrix \code{B} or in the matrix of
+  plausibilities \code{P} may be smaller than the number of model components
+  defined by the argument \code{k}.  Such situation corresponds to the scenario
+  when the user does not know any examples for some   component. In other words, this component is not used as a label for
   any observation, and thus can be omitted from the beliefs matrix. An
   equivalent would be to include a column for this component and fill it
-  with beliefs/plausibilities equal to 0.
+  with beliefs/plausibilities equal 0.
 
-  Slots in the returned object are listed in the next section.
-  The value returned by the functions differs accordingly: the belief() function returns an object with a slot B. 
-  Instead of B, soft() returns an object with a slot P, and supervised() and semisupervised() with a slot class. 
-  The object returned by the supervised() function does not have a slot X.
+  Slots in the returned object are listed in section Value.
+  The returned object differs slighty with respect to the used function. Namely, the \code{belief()} function returns an object with the slot \code{B}. The function \code{soft()} returns an object with a slot \code{P}, while the functions \code{supervised()} and \code{semisupervised()} return objects with a slot \code{class} instead. 
+  
+  The object returned by the function \code{supervised()} does not have the slot \code{X}.
 }
 \value{
-An object of the class mModel, with the following slots:
+An object of the class \code{mModel}, with the following slots:
 \item{pi}{ a vector with the fitted mixing proportions}
 \item{mu}{ a matrix with the means' vectors, fitted for all components}
 \item{cvar}{ a three-dimensional matrix with the covariance matrices, fitted for all components} 
@@ -107,9 +98,9 @@ An object of the class mModel, with the following slots:
 \item{m}{ the number of the unlabeled observations}
 \item{k}{the number of fitted model components}
 \item{d}{the data dimension}
-\item{likelihood}{log-likelihood of the fitted model}
+\item{likelihood}{the log-likelihood of the fitted model}
 \item{n.steps}{the number of steps performed by the EM algorithm}
-\item{model.structure}{the set of constraints kept during the fitting process}
+\item{model.structure}{the set of constraints kept during the fitting process.}
 }
 \references{
   http://bgmm.molgen.mpg.de
@@ -138,5 +129,4 @@ plot(modelSoft)
 
 modelUnSupervised = unsupervised(X=genotypes$X, k=3)
 plot(modelUnSupervised)
-
 }

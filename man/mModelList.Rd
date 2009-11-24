@@ -5,20 +5,18 @@
 \alias{semisupervisedList}
 \alias{supervisedList}
 \alias{unsupervisedList}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Gaussian mixture model fitting for collection of models.
+Fitting Gaussian mixture model or collection of models
 }
 \description{
-These functions fit collection of models of one particular variant. 
-Models may differ in number of Gaussian components or in model structures.
+These functions fit collection of models of one particular variant/class. 
+Models to be fitted may differ in the requested number of Gaussian components or in the requested model structure.
 }
 \usage{
 mModelList(X, knowns, B = NULL, P = NULL, class = NULL, kList = ncol(B), 
     init.params = NULL, stop.likelihood.change = 10^-5, stop.max.nsteps = 100, 
     trace = FALSE, mean = c("D", "E"), between = c("D", "E"), within = c("D", 
-        "E"), cov = c("D", "0"), funct = belief, clusterAssigment = TRUE,
-		all.possible.permutations = FALSE)
+        "E"), cov = c("D", "0"), funct = belief, all.possible.permutations = FALSE)
         
 beliefList(..., funct=belief)
 
@@ -30,39 +28,31 @@ unsupervisedList(X, kList = 2, ...)
 }
 
 \arguments{
-  \item{X}{a data.frame with the unlabeled observations, the rows correspond to the observations and the columns to the dimensions of the data }
-  \item{knowns}{a data.frame with the labeled observations, the rows correspond to the observations and the columns to the dimensions of the data  }
-  \item{B}{a beliefs matrix with the distribution of beliefs for the
-  labeled observations. The rows of B correspond to the labeled
-  observations and are assumed to be given in the same order as in the
-  argument knowns. The columns correspond to the model components. If matrix B is provided then the number of columns has to be not greater than min(kList)   }
-  \item{P}{a  matrix  with plausibilities, i.e., weights for the prior
-  probabilities for the labeled observations. If matrix P is provided then the number of columns has to be not greater than min(kList)  }
-  \item{class}{a vector of classes for the labeled observations. If vector class is provided then the number of unique values has to be not greater than min(kList)  }
-  \item{kList}{vector or list with numbers of components to fit, by default equal to the number of columns of B  }
-  \item{init.params}{initial values for model parameter that will be passed to funct function  }
-  \item{stop.likelihood.change, stop.max.nsteps, trace}{parameters for the EM  algorithm that will be passed to funct function    }
-  \item{mean, between, within, cov}{four vectors which define model structures to fit. If mean="E" then only models with constraint over mean will be considered but if mean=c("E", "D") than both model with constraints over mu parameter and model without constraints will be fitted }
-  \item{funct}{function which fit variant of Gaussian mixture models, one of the: belief, soft, semisupervised or unsupervised functions
-  }
-  \item{clusterAssigment}{parameter for the function init.model.params() which specifies if cluster labels should be agreed with knowns labels  }
- \item{\dots}{arguments that will be passed to function \code{funct}.
-  }
-  \item{all.possible.permutations}{If TRUE then all possible permutations of initial parameters are considered, the resulting model is the model with highest likelihood.}
+  \item{X}{a data.frame with the unlabeled observations. The rows correspond to the observations while the columns to variables/dimensions of the data. }
+  \item{knowns}{a data.frame with the labeled observations. The rows correspond to the observations while the columns to variables/dimensions of the data.  }
+  \item{B}{a beliefs matrix which specifies the distribution of beliefs for the labeled observations. The number of rows in B should equal the number of rows in the  data.frame \code{knowns}. It is assumed that both the observations in \code{B} and in \code{knowns} are given in the same order. Columns correspond to the model components. If matrix B is provided, the number of columns has to be less or equal \code{k}. Internally, the matrix \code{B} is completed to \code{k} columns. }
+  \item{P}{a  matrix of plausibilities, i.e., weights of the prior probabilities for the labeled observations. If matrix \code{P} is provided, the number of columns has to be less or equal \code{k}. The came conditions as for \code{B} apply.}
+  \item{class}{a vector of classes/labels for the labeled observations. The number of its unique values has to be less or equal \code{min(kList)}. }
+  \item{kList}{a vector or a list with numbers of Gaussian components to fit. By default it is one number equal to the number of columns of \code{B}. }
+  \item{init.params}{initial values for the estimates of the model parameters (means, variances and mixing proportions). The initial parameters are internally passed to the \code{funct} function. }
+  \item{stop.likelihood.change, stop.max.nsteps, trace}{the parameters for the EM  algorithm. Internally, these parameters are passed to the \code{funct} function.  }
+  \item{mean, between, within, cov}{four vectors which define the model structures for models to be fitted. For example, if \code{mean="E"}, only models with constrained means are considered (means of Gaussian components are forced to be equal). On the other hand if \code{mean=c("E", "D")}, both models with constrained means and models without constraint on the means are fitted. }
+  \item{funct}{a function which fits a variant of Gaussian mixture model, one of the: \code{belief}, \code{soft}, \code{semisupervised} or \code{unsupervised} functions.  }
+ \item{\dots}{arguments that are passed to function \code{funct}.  }
+  \item{all.possible.permutations}{If equal \code{TRUE}, all possible initial parameters' permutations of components are considered. Since there is kList! permutations,  model fitting is repeated kList! times. As a result only the model with the highest likelihood is returned.}
 }
 \details{
-  Arguments \code{kList} and \code{mean}, \code{between}, \code{within}, \code{cov} define list of models to fit. All combinations of specified model sizes and model structures will be considered. List of fitted models will be returned as result. 
+  Arguments \code{kList}, as well as \code{mean}, \code{between}, \code{within}, and \code{cov} define the list of models to be fitted. All combinations of specified model sizes and model structures are considered. List of fitted models is returned as a result. 
   
-  The argument  \code{funct} defines which variant of Gaussian mixture models should be used for fitting. One can use 
-  wrappers \code{beliefList()}, \code{softList()}, \code{semisupervisedList()}, \code{unsupervisedList()} with prespecified argument \code{funct}.
+  The argument  \code{funct} defines which variant of Gaussian mixture models should be used for model fitting. One can use the wrappers \code{beliefList()}, \code{softList()}, \code{semisupervisedList()}, \code{unsupervisedList()} which call the \code{mModelList()} function and have a prespecified argument \code{funct}.
 }
 \value{
 An object of the class mModelList, with the following slots:
 \item{models}{ a list of models, each of the class \code{\link{mModel}}}
-\item{loglikelihoods}{ a vector with log likelihoods for models from list \code{models}}
-\item{names}{ a vector with names for models from list \code{models}} 
-\item{params}{ a vector with number of parameters of models from list \code{models}}
-\item{kList}{as kList input argument}
+\item{loglikelihoods}{ a vector with log likelihoods of the models from list \code{models}}
+\item{names}{ a vector with names of the models from list \code{models}} 
+\item{params}{ a vector with the number of parameters of models from list \code{models}}
+\item{kList}{equals the input argument \code{kList}}
 }
 \references{
   http://bgmm.molgen.mpg.de
@@ -82,7 +72,7 @@ Przemyslaw Biecek
  plotGIC(models1, penalty="BIC")
 
 ## Do not run
-## could take more than one minute
+## It could take more than one minute
 # simulated = simulateData(d=2, k=3, n=300, m=60, cov="0", within="E", n.labels=2)
 # 
 # models1=mModelList(X=simulated$X, knowns=simulated$knowns, B=simulated$B, 
@@ -100,5 +90,3 @@ Przemyslaw Biecek
 #               kList=2:7, mean="D")
 # plotGIC(models3, penalty="BIC")
 }
-
-

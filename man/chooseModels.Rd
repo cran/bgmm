@@ -1,12 +1,11 @@
 \name{chooseModels}
 \alias{chooseModels}
 \alias{chooseOptimal}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Subset of models.
+Selecting a subset of fitted models
 }
 \description{
-The function chooseModels extracts sublist of models which match requirements for number of components and for models structure. The function chooseOptimal returns the best model with respect to given model selection criteria. 
+The function chooseModels extracts a sublist of models that match constraints on the number of components or on the model structure. The function chooseOptimal returns the model which is the best according the given model selection criteria. 
 }
 \usage{
 chooseModels(models, kList = NULL, struct = NULL)
@@ -15,21 +14,20 @@ chooseOptimal(models, penalty=2)
 }
 
 \arguments{
-  \item{models}{Object of the class \code{\link{mModelList}}
-  }
-  \item{kList}{The vector which specifies requested numbers of Gaussian components. }
-  \item{struct}{The vector which specifies names of requested structures. }
-  \item{penalty}{The penalty for GIC criteria. This parameter can be a single number or one of the strings c("BIC", "AIC").   }
+  \item{models}{an object of the class \code{\link{mModelList}} which represents a list of fitted models.}
+  \item{kList}{a vector which specifies the requested numbers of Gaussian components (constraints on the number of components). }
+  \item{struct}{a vector which specifies four letter abbreviations of names of the requested model structures (constraints on the model structure). }
+  \item{penalty}{a penalty parameter in the GIC criteria. This parameter can be a single number or a string, either "BIC" or "AIC".   }
 }
 \details{
   The function chooseModels() extracts a sublist of models from the \code{models} argument.
-  The returned sublist is composed of models that simultaneously satisfy restrictions for number of Gaussian components defined by \code{kList} and restrictions for model structure defined by \code{struct}.
-  If argument \code{kList} is set to NULL then no restrictions for number of components is applied, same with \code{struct} argument.
+  The returned sublist is also an object of the class \code{\link{mModelList}} and is composed of models that simultaneously satisfy the restrictions of the number of Gaussian components defined by \code{kList} and restrictions of the model structure defined by \code{struct}.
+  If the argument \code{kList} is set to NULL then no restrictions of the number of components are applied, same with the argument \code{struct}.
 
-  The function chooseOptimal() returns the single model of the class \code{\link{mModel}} which has best (smallest) GIC score.
+  The function chooseOptimal() returns an object of the class \code{\link{mModel}} which is the single model that has the best (smallest) GIC score.
 }
 \value{
-The object of the class \code{\link{mModelList}} or \code{\link{mModel}}.
+An object of the class \code{\link{mModelList}} or \code{\link{mModel}}.
 }
 \references{
   http://bgmm.molgen.mpg.de
@@ -45,7 +43,7 @@ Przemyslaw Biecek
  plotGIC(models3, penalty="BIC")
 
 ## Do not run
-## could take more than one minute
+## It could take more than one minute
 # simulated = simulateData(d=2, k=3, n=300, m=60, cov="0", within="E", n.labels=2)
 # 
 # models3 = beliefList(X=simulated$X, knowns=simulated$knowns, B=simulated$B,
@@ -59,5 +57,3 @@ Przemyslaw Biecek
 # model4 = chooseOptimal(models3, "BIC")
 # plot(model4)
 }
-
-

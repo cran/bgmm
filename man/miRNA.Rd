@@ -5,7 +5,7 @@
 \alias{miRNABeliefs}
 \alias{miRNAClass}
 \docType{data}
-\title{miRNA transfection data for miR1 and miR124 target genes.}
+\title{miRNA transfection data for miR1 and miR124 target genes}
 \description{
   miRNA transfection data (Lim et al., 2005) and knowledge from computational
   miRNA target predictions.

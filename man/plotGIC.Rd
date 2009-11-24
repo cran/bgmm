@@ -1,34 +1,32 @@
 \name{plotGIC}
 \alias{plotGIC}
 \title{
-GIC scores plot.
+Plotting GIC scores 
 }
 \description{
-The function \code{plotGIC()} plots GIC scores for collection of models.
+The function \code{plotGIC()} plots the GIC scores for an input collection of models.
 }
 \usage{
 plotGIC(models, penalty = 2, plot.it = TRUE)
 }
 
 \arguments{
-  \item{models}{an object of the class \code{mModelList} or matrix of GIC scores.
+  \item{models}{an object of the class \code{mModelList} or a matrix of GIC scores.
   }
-  \item{penalty}{penalty for GIC criteria. This parameter can be a single number or one of the strings c("BIC", "AIC").     
+  \item{penalty}{a penalty for the GIC criteria. This parameter can be a single number or a string, either "BIC" or "AIC".     
   }
-  \item{plot.it}{logical value which specify does the chart with GIC scores should be plotted.
+  \item{plot.it}{a logical value, if \code{TRUE} then the chart with the GIC scores will be plotted.
   }
 }
 \details{
-The function \code{plotGIC()} calculates GIC scores for each model from the \code{models} list and then 
-plots dotchart with GIC scores for models specified by the \code{models} argument. 
-The function \code{plotGIC()} returns a matrix with calculated GIC scores. This matrix or its submatrix can be used in next call the \code{plotGIC()} function as \code{models} argument.
+The function \code{plotGIC()} calculates the GIC scores for each model from the \code{models} list and, given \code{plot.it=TRUE}, plots a dotchart with the calculated GIC scores. 
 
-The best model, i.e. model with smallest GIC scores is marked by star. 
+As a result the function \code{plotGIC()} returns a matrix with the calculated GIC scores. This matrix or its submatrix can be used in next call of the \code{plotGIC()} function as \code{models} argument. The columns of the  matrix correspond to different component numbers of the models, while the rows correspond to their structures. The structures are coded with four-letter strings. The letters refer, in order from left to right: first, the relation between the means' vectors of the components, which can either be equal (letter "E") or unconstrained ("D"). Second, the relation between covariance matrices, which can all either be equal ("E"), or unconstrained ("D"). Third, the relation between the data vector components (corresponding to data dimensions) within each covariance matrix, i.e. each covariance matrix can either have all variances equal to some constant and all covariances equal to some constant ("E") or can be unconstrained ("D"). Fourth, the covariances in each covariance matrix, which can either all be forced to equal 0 ("0") or be unconstrained ("D").
+
+The best model, i.e. model with the smallest GIC score is marked with a star on the plotted chart. 
 }
 \value{
-The matrix with GIC scores calculated for list of models specified in \code{models} argument. 
-Columns in resulting matrix corresponds to different number of components while rows corresponds to different structures.
-}
+The matrix with GIC scores calculated for the list of models specified by the \code{models} argument. }
 \references{
   http://bgmm.molgen.mpg.de
 }
@@ -43,7 +41,7 @@ Przemyslaw Biecek
  plotGIC(models1, penalty="BIC")
 
 ## Do not run
-## could take more than one minute
+## It could take more than one minute
 # simulated = simulateData(d=2, k=3, n=300, m=60, cov="0", within="E", n.labels=2)
 # 
 # models1=mModelList(X=simulated$X, knowns=simulated$knowns, B=simulated$B, 
@@ -59,5 +57,3 @@ Przemyslaw Biecek
 #               kList=2:7, mean="D")
 # plotGIC(models3, penalty="BIC")
 }
-
-

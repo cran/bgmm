@@ -1,27 +1,25 @@
 \name{plot.mModel}
 \alias{plot.mModel}
 \title{
-Plots a graphical visualization of Gaussian component models for single model for one-dimensional or two-dimensional data.
+Plotting a graphical visualization of a Gaussian model or a list of models for one-dimensional or two-dimensional data
 }
 \description{
-This function will work only for one od two dimensinal data.
-
-The generic function \code{plot} is used to visualize data set and fitted Gaussian components. 
-The observations without labels are denoted by black points, the labeled observations are marked by different colors and different symbols. The fitted Gaussian components are represented by ellipses for two-dimensional case and by densities in one dimensional case.
+The generic function \code{plot} is used to visualize the data set and Gaussian model components fitted to this data. On the resulting plot the observations without labels are presented with  black points, whereas the labeled observations are marked by different colors and different symbols. This function works only for one or two dimensional data. The fitted Gaussian components are represented by ellipses int the two-dimensional case and by densities in the one dimensional case.
 }
 \usage{
 plot.mModel(x, ...)
 }
 
 \arguments{
-  \item{x}{An object of the class \code{mModel}.
+  \item{x}{an object of the class \code{mModel}.
   }
-  \item{\dots}{Graphical arguments that will be passed to underlying \code{plot()} function.
+  \item{\dots}{graphical arguments that are passed to the underlying \code{plot()} function.
   }
 }
 \details{
-  For one dimensional data the width of density corresponds to sd for fitted Gaussian component. Fitted means are marked by veritical dashed lines.
-  For two dimensional data ellipses represents covariances for corresponding model components.   
+  For one dimensional data the width of the density corresponds to standard deviation of the fitted Gaussian component. Fitted means are marked by veritical dashed lines.
+  
+  For two dimensional data ellipses represents covariances for the corresponding model components.   
 }
 \references{
   http://bgmm.molgen.mpg.de
@@ -51,5 +49,3 @@ Przemyslaw Biecek
  modelUnSupervised = unsupervised(X=genotypes$X, k=3)
  plot(modelUnSupervised)
 }
-
-

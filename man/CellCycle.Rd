@@ -6,7 +6,7 @@
 \alias{CellCycleClass}
 \docType{data}
 \title{Data for clustering of 384 cell cycle genes into five clusters
-  corresponding to cell cycle phases.}
+  corresponding to cell cycle phases}
 \description{
   Time course expression data for 384 cell cycle genes (Cho et al.,
   1998). Literature examples of genes that should, and of genes that should not

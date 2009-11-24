@@ -7,22 +7,30 @@ DEprobs <- function(model, verbose=FALSE){
   ## Get the right component to correspond to the differentially expressed genes -- which looks like the differential one according to the posterior probabilities
   ## For models of size 2 -- should be the one with a broader range (encompassing the other, or the one with higher maximum deviation from 0 (we assume the data are centered around 0 and are both positive and negative)
 
-  d=model$X
-  if (!is.null(model$knowns))
-    d=rbind(d, model$knowns)
-  preds=predict(model, d)
+  if (!is.null(model$knowns)){
+    preds=predict(model, model$X, knowns=model$knowns, B=model$B)
+	}
+else
+  preds=predict(model, model$X)
 
   if (k==2)
-    resp=check2res(d, preds, verbose)
+    resp=check2res(model$X, model$knowns, preds, verbose)
   else
-    resp=check3res(d, model, verbose)
-
+    resp=check3res(model$X, model$knowns, preds, model$mu, verbose)
+#browser()
   return(resp)
 }
 
 
-check2res <- function(d, preds,verbose){
-  class=preds$class
+check2res <- function(X, knowns, preds,verbose){
+	d=X
+	class=preds$class.X
+
+	if (!is.null(knowns)){
+		d=rbind(d,knowns)
+		class=c(class, preds$class.knowns)
+		}
+    #identify the differential component
   d1 <- d[class==1]
   d2 <- d[class==2]
   r1 <- range(d1)
@@ -41,29 +49,43 @@ check2res <- function(d, preds,verbose){
     }
   }## diff either encompasses or has higher dev from 0
   
-  p <- preds$tij[,diff]
-  downs <- (d<0)
-  p[downs] <- p[downs]*(-1)
   if (verbose)
     print(paste("The differential component number:",diff))
-  return(list(diff.p=p, diff.c=c(diff)))
+    
+  p.X <- preds$tij.X[,diff]
+  downs.X <- (X<0)
+  p.X[downs.X] <- p.X[downs.X]*(-1)
+  
+  p.knowns=NULL
+  if(!is.null(knowns)){
+ 	p.knowns <- preds$tij.knowns[,diff]
+  	downs.knowns <- (knowns<0)
+  	p.knowns[downs.knowns] <- p.knowns[downs.knowns]*(-1)
+	}
+  return(list(diff.p.X=p.X, diff.p.knowns=p.knowns, diff.c=c(diff)))
 }
 
 
-check3res <- function(d, model, verbose){
+check3res <- function(X, knowns, preds, mu, verbose){
   ##order by means
-  ord=order(model$mu)
-  preds=predict(model, d)
-  tij=preds$tij[,ord]
-
-  if (verbose){
+  ord=order(mu)
+ if (verbose){
     print(paste("the downregulated component number:", ord[1]))
     print(paste("the upregulated component number:", ord[3]))
   }
 
-  p <- -1*tij[,1] ##probability of down-regulation
-  ups <- (d>0) 
-  p[ups] <- tij[ups,3]
+  tij.X=preds$tij.X[,ord]
+  p.X <- -1*tij.X[,1] ##probability of down-regulation
+  ups.X <- (X>0) 
+  p.X[ups.X] <- tij.X[ups.X,3]
 
-  return(list(diff.p=p, diff.c=c(ord[1],ord[3])))
+  
+  p.knowns=NULL
+  if(!is.null(knowns)){
+	tij.knowns=preds$tij.knowns[,ord]
+  	p.knowns <- -1*tij.knowns[,1] ##probability of down-regulation
+  	ups.knowns <- (knowns>0) 
+  	p.knowns[ups.knowns] <- tij.knowns[ups.knowns,3]
+  }
+  return(list(diff.p.X=p.X, diff.p.knowns=p.knowns, diff.c=c(ord[1],ord[3])))
 }

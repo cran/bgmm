@@ -1,26 +1,24 @@
 \name{plot.mModelList}
 \alias{plot.mModelList}
 \title{
-Plots a graphical visualization for every model from list of models.
+Plotting a graphical visualization of a model or a list of models
 }
 \description{
-The function \code{plot.mModelList()} creates a grid of panels and then plots fitted models in consecutive panels. The \code{plot.mModel()} function is used to plot single model.
+The function \code{plot.mModelList()} creates a grid of panels and then plots a set of input fitted models in the consecutive panels. The \code{plot.mModel()} function is used to plot each single model.
 }
 \usage{
 plot.mModelList(x, ...)
 }
 
 \arguments{
-  \item{x}{An object of the class \code{mModelList},
-  }
-  \item{\dots}{Graphical arguments that will be passed to underlying \code{plot()} function.
-  }
+  \item{x}{an object of the class \code{mModelList}.  }
+  \item{\dots}{graphical arguments that are passed to underlying \code{plot()} function.  }
 }
 \details{
-The argument \code{x} specifies a list of models. If these models differ both in number of components and in model structures, 
-then in the resulting grid of panels columns will correspond to different model structures while rows will correspond to different number of components. 
+The argument \code{x} is a list of models. If these models differ both by component numbers and by the model structures, 
+in the resulting grid of panels columns correspond to the different model structures while rows correspond to the different component numbers. 
 
-If considered models differ only in number of components or in model structures then the grid of panels will be as close to square as possible and consecutive panels will present consecutive models from model list.
+If considered models differ only by component numbers or only by the model structures, the grid of panels is as close to square as possible and consecutive panels contain consecutive models from the list of models \code{x}.
 }
 \references{
   http://bgmm.molgen.mpg.de
@@ -37,7 +35,7 @@ Przemyslaw Biecek
  plot(models1)
 
 ## Do not run
-## could take more than one minute
+## It could take more than one minute
 # simulated = simulateData(d=2, k=3, n=300, m=60, cov="0", within="E", n.labels=2)
 # 
 # models1=mModelList(X=simulated$X, knowns=simulated$knowns, B=simulated$B, 
@@ -53,5 +51,3 @@ Przemyslaw Biecek
 #               kList=2:7, mean="D")
 # plot(models3)
 }
-
-

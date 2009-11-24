@@ -6,7 +6,7 @@
 Belief-based Gaussian mixture modeling
 }
 \description{
-This package implements partially supervised mixture modeling methods: soft-label and belief-based modeling, the semi-supervised methods and for completeness also unsupervised and fully supervised method for mixture modeling. 
+This package implements partially supervised mixture modeling methods: soft-label and belief-based modeling, the semi-supervised methods and for completeness also unsupervised and fully supervised methods for mixture modeling. 
 }
 \details{
 \tabular{ll}{
@@ -25,16 +25,16 @@ Przemyslaw Biecek \& Ewa Szczurek
 Maintainer: Przemyslaw Biecek <P.Biecek@mimuw.edu.pl>
 }
 \references{
-Szczurek E, Biecek P, Tiuryn J, Vingron M., ...., submitted.
+Biecek P, Szczurek E, Tiuryn J, Vingron M., ...., submitted.
 ...
 }
 \keyword{ package }
 \seealso{
-package for unsupervised learning of Gaussian mixture model \code{link{mclust}}, 
+Package for unsupervised learning of Gaussian mixture model \code{link{mclust}}, 
 methods for supervised learning \code{link{MASS::lda()}}, \code{link{MASS::qda()}}.
 }
 \examples{
 ## Do not run
-## could take more than one minute
+## It could take more than one minute
 #demo(bgmm)
 }

@@ -2,28 +2,23 @@
 \alias{genotypes}
 \docType{data}
 \title{
-Fluorescence signals corresponding to a given allele for 333 SNPs.
+Fluorescence signals corresponding to a given allele for 333 SNPs
 }
 \description{
-This dataset describes 333 SNPs. Rows in the slots \code{X} and \code{knowns} 
-correspond to different SNPs, while values in columns represents an intensity of 
-the fluorescence signal corresponding to the selected alleles of a given SNP. 
+The genotypes dataset describes 333 SNPs. Each SNP is characterized by the presence of one of its two possible alleles (or the presence of both of them). Therefore, the SNPs can be divided into three types. The first type corresponds to the SNPs with the first possible allele, the second type with the second allele, and the third with both alleles. The presence of the alleles is measured experimentally with fluorescence intensities. The dataset contains the intensities in the slots \code{X} and \code{knowns}. 
 
-To prepare the input for the partially and semi-supervised modeling methods 15 SNPs was 
-separated by choosing at random five SNPs per each cluster. For the partially supervised 
-methods, the belief/plausibility values of the most probable type reflect the high 
-certainty of the labels and are set to 0.95, and of the remaining types are equal 0.025. 
+15 SNPs in the dataset are given their correct type. These 'known' SNPs can be used as the input for the semi-, partially and fully superised modeling methods. They were selected by taking at random five SNPs per each type.  Their intensities are contained in the slot \code{knowns}. Their belief/plausibility values (given in the slot \code{B}) of the most probable type (the slot \code{labels}) are set to 0.95, and of the other two types are equal 0.025. 
 The remaining 318 SNPs are kept unlabeled.
 }
 \usage{data(genotypes)}
 \format{
-  X       : matrix 318x2
-  knowns  : matrix 15x2
-  B       : matrix 15x3
-  labels  : vector 15
-}
+  X       : a matrix with 318 rows (unlabeled SNPs) and 2 columns (alleles)
+  knowns  : a matrix with 15 rows (known SNPs) and 2 columns (alleles)
+  B       : a matrix with 15 rows (known SNPs) and 3 columns (types)
+  labels  : a vector of length 15 (types of the known SNPs)
+  }
 \details{
-  \code{genotypes} A list, where slot X corresponds to fluorescence signals of unlabeled SNPs, slot knowns corresponds to fluorescence signal of lablled SNPs, slot B corresponds to belief matrix while labels contains true labels for labeled SNPs.
+	The rows of both the slots \code{X} and \code{knowns}  correspond to the SNPs. For each SNP, the values in the columns represent the intensities of the fluorescence signal corresponding to the alleles of the SNP. The slot  \code{B} corresponds to the belief matrix while  \code{labels} contains the true types for the labeled SNPs.
 }
 
 \references{
