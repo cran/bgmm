@@ -198,7 +198,7 @@ belief.internal <- function(X, model.params, model.structure, stop.likelihood.ch
     if (stopP)
           break
     if (trace) {
-      cat("step:          ", n.steps, "\n likelihood:   ", tmp$log.likelihood, "\n change:       ", tmp$log.likelihood - prev.likelihood, "\n\n")
+      cat("step:          ", n.steps, "\n params:   ", paste(paste(model.params$mu, collapse=","),paste(model.params$cvar, collapse=","),paste(model.params$pi, collapse=","),sep=":"), "\n likelihood:   ", tmp$log.likelihood, "\n change:       ", tmp$log.likelihood - prev.likelihood, "\n\n")
     }
     if ((abs(tmp$log.likelihood - prev.likelihood)/ifelse(is.infinite(prev.likelihood), 1,  (1+abs(prev.likelihood))) < stop.likelihood.change) || 
         (n.steps >= stop.max.nsteps)) {

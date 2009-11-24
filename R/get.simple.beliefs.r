@@ -11,13 +11,16 @@ get.simple.beliefs <- function(id, k=length(unique(id)), b.min=0.025) {
 
 # only for 1d data
 init.model.params.HC <- function(dat, k) {
-  mu = matrix(tapply(sort(dat),
-          ceiling(seq_along(dat)*k/length(dat)),
-          mean), k, 1)
-  cvar = array(tapply(sort(dat),
-          ceiling(seq_along(dat)*k/length(dat)),
-          var), c(k,1,1))
+  mu = matrix(sapply(1:k, function(i) mean(dat[dat < quantile(dat, i/k) & dat > quantile(dat, (i - 1)/k)])), k, 1)
+  cvar = array(sapply(1:k, function(i) var(dat[dat < quantile(dat, i/k) & dat > quantile(dat, (i - 1)/k)])), c(k,1,1))
   pi = rep(1/k, k)
+#  mu = matrix(tapply(sort(dat),
+#          ceiling(seq_along(dat)*k/length(dat)),
+#          mean), k, 1)
+#  cvar = array(tapply(sort(dat),
+#          ceiling(seq_along(dat)*k/length(dat)),
+#          var), c(k,1,1))
+#  pi = rep(1/k, k)
   list(pi = pi, mu = mu, cvar = cvar)
 }
 
@@ -56,7 +59,7 @@ init.model.params <- function(X=NULL, knowns=NULL, class=NULL, k=length(unique(c
     pro = numeric(k)
     cvar = array(0, c(k, d, d))
     if (d == 1) {
-      model.params = init.model.params.HC(X, k)
+      model.params = init.model.params.HC(c(knowns,X), k)
     } else if (k == 1) {
       mu[1,] = unlist(colMeans(kX))
       cvar[1,,] = cov(kX)
