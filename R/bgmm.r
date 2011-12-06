@@ -29,16 +29,16 @@ predict.mModel <- function(object, X, knowns=NULL, B=NULL, P=NULL, ...) {
         b.pi[1:nrow(knowns),] = P * b.pi[1:nrow(knowns),]
 #        b.pi[nrow(X) - (nrow(knowns):1) +1,] = P * b.pi[nrow(X) - (nrow(knowns):0),]
 
-  tik =  t(apply(fik * b.pi, 1, normalize))
-  class = get.labels.from.beliefs(tik)
+  tij =  t(apply(fik * b.pi, 1, normalize))
+  class = get.labels.from.beliefs(tij)
   # return predictions as two separate slots
   tij.knowns = NULL
-  tij.X = tik
+  tij.X = tij
   class.knowns = NULL
   class.X = class
   if (!is.null(P) | !is.null(B)) {
-     tij.knowns = tik[1:nrow(knowns),,drop=F]
-     tij.X = tik[-(1:nrow(knowns)),,drop=F]
+     tij.knowns = tij[1:nrow(knowns),,drop=F]
+     tij.X = tij[-(1:nrow(knowns)),,drop=F]
      class.knowns = class[1:nrow(knowns)]
      class.X = class[-(1:nrow(knowns))]
   }
@@ -208,7 +208,7 @@ belief.internal <- function(X, model.params, model.structure, stop.likelihood.ch
   repeat {
     n.steps = n.steps +1
     tmp = bgmm.e.step(X, model.params) 
-    model.params = bgmm.m.step(X, model.params, model.structure, tmp$tik)
+    model.params = bgmm.m.step(X, model.params, model.structure, tmp$tij)
     if (stopP)
           break
     if (trace) {
@@ -224,7 +224,7 @@ belief.internal <- function(X, model.params, model.structure, stop.likelihood.ch
   
   model.params$likelihood = prev.likelihood
   model.params$n.steps = n.steps
-  model.params$tik = tmp$tik
+  model.params$tij = tmp$tij
   model.params
 }
 
@@ -268,11 +268,17 @@ loglikelihood.mModel <- function(model, X) {
 # ICs
 #
 
-getGIC <- function(model, p=2) {
+getGIC <- function(model, p=2, whichobs="unlabeled") {
   tmpDF = getDF(model)
-  fij   = fij.mModel(model, model$X)
+  workingX = switch (whichobs, 
+              unlabeled = model$X,
+              labeled   = model$knowns,
+              all       = rbind(model$X, model$knowns),
+              stop("getGIC: unsupported value of the parameter whichobs"))
+  n = max(nrow(workingX),1)
+
+  fij   = fij.mModel(model, workingX)
   if ("numeric" %in% class(p)) return (-2*sum(log(rowSums(fij))) +  p * tmpDF)
-  n     = max(model$n - model$m,1)
   penalty = 0
   if ("character" %in% class(p)) 
       penalty = switch(p, 
@@ -339,8 +345,8 @@ chooseModels <- function(models, kList = NULL, struct = NULL) {
 
 
 
-chooseOptimal <- function(models, penalty=2) {
-   values = sapply(models$models, getGIC, p=penalty)
+chooseOptimal <- function(models, penalty=2, ...) {
+   values = sapply(models$models, getGIC, p=penalty, ...)
    models$models[[which.min(values)[1]]] 
 }
 

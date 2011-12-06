@@ -15,6 +15,6 @@ bgmm.e.step <- function(X, model.params) {
   b.pi <- rbind(model.params$B, repeat.rows(model.params$pi, model.params$n-model.params$m))
   # normalisation step
   fb.ik = exp(lfik) * b.pi
- list(tik =  t(apply(fb.ik, 1, normalize)), log.likelihood=sum(log(rowSums(fb.ik))) )
+ list(tij =  t(apply(fb.ik, 1, normalize)), log.likelihood=sum(log(rowSums(fb.ik))) )
 }
 

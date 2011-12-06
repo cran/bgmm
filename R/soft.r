@@ -51,7 +51,7 @@ soft.internal <- function(X, model.params, model.structure, stop.likelihood.chan
   repeat {
     n.steps = n.steps +1
     tmp = soft.e.step(X, model.params) 
-    model.params = bgmm.m.step(X, model.params, model.structure, tmp$tik, priors.like.bgmm=FALSE)
+    model.params = bgmm.m.step(X, model.params, model.structure, tmp$tij, priors.like.bgmm=FALSE)
     if (trace) {
       cat("step:          ", n.steps, "\n likelihood:   ", tmp$log.likelihood, "\n change:       ", tmp$log.likelihood - prev.likelihood, "\n\n")
     }
@@ -64,7 +64,7 @@ soft.internal <- function(X, model.params, model.structure, stop.likelihood.chan
   }
   model.params$likelihood = prev.likelihood
   model.params$n.steps = n.steps
-  model.params$tik = tmp$tik
+  model.params$tij = tmp$tij
   model.params
 }
 

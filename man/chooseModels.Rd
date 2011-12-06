@@ -10,7 +10,7 @@ The function chooseModels extracts a sublist of models that match constraints on
 \usage{
 chooseModels(models, kList = NULL, struct = NULL)
 
-chooseOptimal(models, penalty=2)
+chooseOptimal(models, penalty=2, ...)
 }
 
 \arguments{
@@ -18,6 +18,7 @@ chooseOptimal(models, penalty=2)
   \item{kList}{a vector which specifies the requested numbers of Gaussian components (constraints on the number of components). }
   \item{struct}{a vector which specifies four letter abbreviations of names of the requested model structures (constraints on the model structure). }
   \item{penalty}{a penalty parameter in the GIC criteria. This parameter can be a single number or a string, either "BIC" or "AIC".   }
+  \item{...}{other arguments that will be passed to the getGIC function.}
 }
 \details{
   The function chooseModels() extracts a sublist of models from the \code{models} argument.

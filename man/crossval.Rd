@@ -1,7 +1,7 @@
 \name{crossval}
 \alias{crossval}
 \title{
-k-fold cross-validation for a model
+k-fold cross-validation for the specified model
 }
 \description{
 The function \code{crossval()} performes k-fold cross-validation.
@@ -36,7 +36,7 @@ Then each subset is used as test set against a train set build from all remainin
 For each model the error is calculated as average absolute differences between the distribution of estimated posteriors and distribution of beliefs/plausibilities for labeled cases.
 }
 \value{
-The list with three values: errors with mean absolute difference between estimated posterior and initial beliefs for known cases, indexes of folds for both labeled and unlabeled cases. }
+The list with three vectors: errors calculated as mean absolute differences between estimated posteriors and initial beliefs for known cases, indexes of folds for both labeled and unlabeled cases. }
 \references{
   http://bgmm.molgen.mpg.de
 }

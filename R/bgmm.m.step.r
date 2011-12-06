@@ -1,18 +1,18 @@
-bgmm.m.step <- function(X, model.params, model.structure, tik, eps=10^-6, priors.like.bgmm=TRUE) {
+bgmm.m.step <- function(X, model.params, model.structure, tij, eps=10^-6, priors.like.bgmm=TRUE) {
   new.model.params = model.params
  
   # new prior distribution
   if (priors.like.bgmm) {
-    new.model.params$pi = colMeans(tik[-(1:model.params$m),])
+    new.model.params$pi = colMeans(tij[-(1:model.params$m),])
   } else { # soft
-    new.model.params$pi = colMeans(tik)
+    new.model.params$pi = colMeans(tij)
   }
 
   # new means 
   if  (model.structure$mean=="D") {
     # different mean for every component
     for (i in 1:model.params$k) 
-         new.model.params$mu[i, ] = apply(X, 2, weighted.mean, tik[,i])
+         new.model.params$mu[i, ] = apply(X, 2, weighted.mean, tij[,i])
   } else {
     # same mean for every component
     new.model.params$mu = repeat.rows(colMeans(X), model.params$k)
@@ -20,8 +20,8 @@ bgmm.m.step <- function(X, model.params, model.structure, tik, eps=10^-6, priors
 
   # new variance matrix  
   for (i in 1:model.params$k) {
-       tmp       = (X - repeat.rows(new.model.params$mu[i, ], model.params$n)) * sqrt(tik[,i])
-       new.model.params$cvar[i, , ] = t(tmp) %*% tmp / sum(tik[,i])
+       tmp       = (X - repeat.rows(new.model.params$mu[i, ], model.params$n)) * sqrt(tij[,i])
+       new.model.params$cvar[i, , ] = t(tmp) %*% tmp / sum(tij[,i])
        if (det(new.model.params$cvar[i, , ]) < eps)
           new.model.params$cvar[i, , ] = model.params$cvar[i, , ]
   }

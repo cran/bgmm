@@ -23,11 +23,11 @@ soft.e.step <- function(X, model.params) {
 #  repeat.rows(rep(-log(model.params$k), model.params$k), model.params$n-model.params$m))
 
   fik = exp(lfik)
-  tik = t(t(p.ik) * model.params$pi) * fik
-  n.ltik = log(rowSums(tik))
-  log.likelihood = sum(n.ltik)
-  tik = tik/exp(n.ltik)
+  tij = t(t(p.ik) * model.params$pi) * fik
+  n.ltij = log(rowSums(tij))
+  log.likelihood = sum(n.ltij)
+  tij = tij/exp(n.ltij)
   # normalisation step
   
-  list(tik =  tik, log.likelihood=log.likelihood )
+  list(tij =  tij, log.likelihood=log.likelihood )
 }

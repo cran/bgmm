@@ -9,9 +9,9 @@ Plotting GIC scores
 The function \code{plotGIC()} plots the GIC scores for an input collection of models. The function \code{getGIC()} extracts GIC for given model and penalty function. The function \code{getDF()} extracts the number of degree of freedom for model parameters.
 }
 \usage{
-plotGIC(models, penalty = 2, plot.it = TRUE)
+plotGIC(models, penalty = 2, plot.it = TRUE, ...)
 
-getGIC(model, p = 2)
+getGIC(model, p = 2, whichobs="unlabeled")
 
 getDF(model)
 }
@@ -25,8 +25,11 @@ getDF(model)
   }
   \item{p}{same as \code{penalty},  
   }
+  \item{whichobs}{one of "unlabeled", "labeled", "all". This parameter specify which observations should be used in the likelihood and gic score calculation,  
+  }
   \item{plot.it}{a logical value, if \code{TRUE} then the chart with the GIC scores will be plotted.
   }
+  \item{...}{other arguments that will be passed to the getGIC function.}
 }
 \details{
 The function \code{plotGIC()} calculates the GIC scores for each model from the \code{models} list and, given \code{plot.it=TRUE}, plots a dotchart with the calculated GIC scores. 
@@ -45,7 +48,7 @@ Przemyslaw Biecek
 }
 \examples{
  simulated = simulateData(d=2, k=3, n=100, m=60, cov="0", within="E", n.labels=2)
- models1=mModelList(X=simulated$X, knowns=simulated$knowns, B=simulated$B, 
+ models1   = mModelList(X=simulated$X, knowns=simulated$knowns, B=simulated$B, 
              kList=3:4, mean=c("D","E"), between="D", within="D", 
              cov="0", funct=belief)
  plotGIC(models1, penalty="BIC")

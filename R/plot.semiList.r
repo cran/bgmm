@@ -1,4 +1,4 @@
-plotGIC <- function(models, penalty=2, plot.it=TRUE) {
+plotGIC <- function(models, penalty=2, plot.it=TRUE, ...) {
   if (!("mModelList" %in% class(models))) {
     if (plot.it) {
       dotchart(models, xlab=paste("GIC"),pch=19)
@@ -8,7 +8,7 @@ plotGIC <- function(models, penalty=2, plot.it=TRUE) {
   }
   if (length(models$models)==length(models$kList) || length(models$kList)==1) {
      # only one variable
-    values = sapply(models$models, getGIC, p=penalty)
+    values = sapply(models$models, getGIC, p=penalty, ...)
     tnames = models[[3]]
     names(values) = tnames
     if (plot.it) {
@@ -20,7 +20,7 @@ plotGIC <- function(models, penalty=2, plot.it=TRUE) {
     }
     return(values)
   } else {
-    values = sapply(models$models, getGIC, p=penalty)
+    values = sapply(models$models, getGIC, p=penalty, ...)
     tmp= matrix(values, ncol=length(models$kList))
     rownames(tmp) = sapply(strsplit((models[[3]])[1:(length(models[[3]])/length(models$kList))]," "), tail,1)
     colnames(tmp) = paste("k=",models$kList,sep="")
