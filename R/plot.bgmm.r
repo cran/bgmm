@@ -20,7 +20,7 @@ plot.mModel <- function(x, ...) {
 }
 
 
-plot.2d <-function(X, knowns, map.class, bgmm2d, ...) {
+plot.2d <-function(X, knowns, map.class, bgmm2d, ..., col.alpha=0.5, cex.points=0.5) {
   if (bgmm2d$d > 2) {
       tmp     <- prcomp(rbind(X, knowns))
       bgmm2d$mu<- data.frame(bgmm2d$mu)
@@ -30,8 +30,9 @@ plot.2d <-function(X, knowns, map.class, bgmm2d, ...) {
       bgmm2d$mu<- predict(tmp, bgmm2d$mu)[,1:2]
       B       <- tmp$rotation[,1:2]
       cvar = array(0,dim=c(bgmm2d$k,2,2))
-      for (i in 1:(bgmm2d$k)) 
-          cvar[i,,] <- t(B) %*% bgmm2d$cvar[1,,] %*% B
+     if (bgmm2d$k > 0)
+        for (i in 1:(bgmm2d$k)) 
+            cvar[i,,] <- t(B) %*% bgmm2d$cvar[1,,] %*% B
       bgmm2d$cvar <- cvar
    }
 
@@ -40,17 +41,18 @@ plot.2d <-function(X, knowns, map.class, bgmm2d, ...) {
    plot(Xk, type="n", ...)
    #
    # plot unknowns
-   points(X, pch=19, col=rgb(0,0,0,0.5), cex=0.5)
+   points(X, pch=19, col=rgb(0,0,0,col.alpha), cex=cex.points)
    #
    # plot knowns
    if (!is.null(map.class))
        points(knowns, col=map.class+1, pch=map.class+1, lwd=2)
    #
    # plot densities
-   for (i in 1:bgmm2d$k) {
-       car::ellipse(center = bgmm2d$mu[i, ], shape = bgmm2d$cvar[i, , ], radius = 1, col=i+1, lwd=2, lty=2)
-       car::ellipse(center = bgmm2d$mu[i, ], shape = bgmm2d$cvar[i, , ], radius = 2, col=i+1, lwd=1, lty=2)
-       }
+   if (bgmm2d$k > 0)
+     for (i in 1:bgmm2d$k) {
+         car::ellipse(center = bgmm2d$mu[i, ], shape = bgmm2d$cvar[i, , ], radius = 1, col=i+1, lwd=2, lty=2)
+         car::ellipse(center = bgmm2d$mu[i, ], shape = bgmm2d$cvar[i, , ], radius = 2, col=i+1, lwd=1, lty=2)
+         }
 }
 
 
