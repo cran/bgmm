@@ -23,9 +23,23 @@ soft.e.step <- function(X, model.params) {
 #  repeat.rows(rep(-log(model.params$k), model.params$k), model.params$n-model.params$m))
 
   fik = exp(lfik)
+  # numeric problems, trying to adjust, by keeping likelihood not so far from each other
+  lcorrection <- 0
+  if (max(fik) == 0) {
+  	lcorrection <- max(lfik) 
+  	lfik = lfik - lcorrection
+  	# unbalanced case
+  	toCorr <- which(apply(lfik, 2, max) < -16)
+  	if (length(toCorr)>0) {
+  		for (correct in toCorr) 
+  		  lfik[, correct] <- lfik[, correct] - max( lfik[, 2]) - 16
+  	}
+    fik = exp(lfik)
+  }
   tij = t(t(p.ik) * model.params$pi) * fik
-  n.ltij = log(rowSums(tij))
-  log.likelihood = sum(n.ltij)
+  margintij <- pmax(rowSums(tij), 10*.Machine$double.eps) # machine epsilon
+  n.ltij = log(margintij)
+  log.likelihood = sum(n.ltij) #  + lcorrection
   tij = tij/exp(n.ltij)
   # normalisation step
   
