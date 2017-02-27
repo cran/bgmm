@@ -3,7 +3,7 @@
 \alias{bgmm}
 \docType{package}
 \title{
-Belief-based Gaussian mixture modeling
+Belief-Based Gaussian Mixture Modeling
 }
 \description{
 This package implements partially supervised mixture modeling methods: soft-label and belief-based modeling, the semi-supervised methods and for completeness also unsupervised and fully supervised methods for mixture modeling. 
@@ -12,8 +12,8 @@ This package implements partially supervised mixture modeling methods: soft-labe
 \tabular{ll}{
 Package: \tab bgmm\cr
 Type: \tab Package\cr
-Version: \tab 1.6\cr
-Date: \tab 2013-11-18\cr
+Version: \tab 1.8\cr
+Date: \tab 2017-02-22\cr
 License: \tab GPL-3\cr
 LazyLoad: \tab yes\cr
 }

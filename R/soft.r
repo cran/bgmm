@@ -1,4 +1,7 @@
-soft <- function(X, knowns, P=NULL, k=ifelse(!is.null(P),ncol(P),ifelse(!is.null(B),ncol(B),length(unique(class)))), B=NULL, class=NULL, init.params=init.model.params(X, knowns, class=class, B=P, k=k), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE, b.min=0.025, all.possible.permutations=FALSE) {
+soft <- function(X, knowns, P=NULL, k=ifelse(!is.null(P),ncol(P),ifelse(!is.null(B),ncol(B),length(unique(class)))), 
+                 B=NULL, class=NULL, init.params=init.model.params(X, knowns, class=class, B=P, k=k), 
+                 model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, 
+                 trace=FALSE, b.min=0.025, all.possible.permutations=FALSE, pca.dim.reduction = NA, ...) {
   if (is.null(dim(knowns)) || is.data.frame(knowns)) knowns = as.matrix(knowns)
   if (is.null(dim(X)) || is.data.frame(X)) X = as.matrix(X)
   if (is.null(P)) {
@@ -17,6 +20,34 @@ soft <- function(X, knowns, P=NULL, k=ifelse(!is.null(P),ncol(P),ifelse(!is.null
     P = cbind(P, matrix(0,nrow(P),k - ncol(P)))
   if (ncol(X) != ncol(knowns))  
       stop("number of columns in X and knowns must agree")
+  
+  
+  #
+  # Dim reduction needed, since for large dimenstion fitting fails
+  if (is.na(pca.dim.reduction)) {
+    # set number od dimensions to scale
+    pca.dim.reduction <- max(ncol(P)+1, 5)
+  }
+  # reduce data with the PCA
+  if (is.numeric(pca.dim.reduction)) {
+    if (pca.dim.reduction < ncol(P)) {
+      warning("PCA reduction to dim smaller than collumns in P, fixing that")
+      pca.dim.reduction = ncol(P)
+    }
+    # is has sense only if number of columns in X is larger than pca.dim.reduction
+    if (pca.dim.reduction < ncol(X)) {
+      rotationObject <- prcomp(rbind(X,knowns))
+      X <- predict(rotationObject, X)[,1:pca.dim.reduction, drop=FALSE]
+      knowns <- predict(rotationObject, knowns)[,1:pca.dim.reduction, drop=FALSE]
+      
+      # needs to update model params !!!
+      init.params = init.model.params(X, knowns, B=B, P=P, class=class, k=k)
+    } else {
+      pca.dim.reduction = FALSE
+    }
+  }
+  
+  
   init.params$P = P
   init.params$m = nrow(knowns)
   init.params$n = nrow(knowns) + nrow(X)
@@ -39,6 +70,12 @@ soft <- function(X, knowns, P=NULL, k=ifelse(!is.null(P),ncol(P),ifelse(!is.null
   
   result$dof = getDFinternal(result)
 
+  result$pca.dim.reduction <- -1
+  if (is.numeric(pca.dim.reduction)) {
+    result$rotationObject <- rotationObject
+    result$pca.dim.reduction <- pca.dim.reduction
+  }
+  
   result
 }
 
@@ -68,7 +105,7 @@ soft.internal <- function(X, model.params, model.structure, stop.likelihood.chan
   model.params
 }
 
-unsupervised <- function(X, k, init.params=init.model.params(X, knowns=NULL, k=k), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE) {
+unsupervised <- function(X, k, init.params=init.model.params(X, knowns=NULL, k=k), model.structure=getModelStructure(), stop.likelihood.change=10^-5, stop.max.nsteps=100, trace=FALSE, ...) {
   if (is.null(dim(X)) || is.data.frame(X)) X = as.matrix(X)
   init.params$P = NULL
   init.params$m = 0

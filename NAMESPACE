@@ -3,7 +3,7 @@ export(
    belief, soft, supervised, semisupervised, unsupervised, 
 
    # fit for list of  models 
-   softList, beliefList, mModelList, semisupervisedList,
+   softList, beliefList, mModelList, semisupervisedList, unsupervisedList,
 
    # predict for model
    predict.mModel,
@@ -22,7 +22,19 @@ export(
    simulateData, determinant.numeric,
    DEprobs
 )
+S3method(determinant, numeric)
+S3method(plot, mModel)
+S3method(plot, mModelList)
+S3method(predict, mModel)
 import(car)
 import(combinat)
 import(lattice)
 import(mvtnorm)
+importFrom("grDevices", "rgb")
+importFrom("graphics", "abline", "dotchart", "matplot", "mtext", "par",
+          "plot", "points", "rug")
+importFrom("stats", "cov", "dist", "dnorm", "kmeans", "prcomp",
+          "predict", "quantile", "rexp", "rnorm", "var",
+          "weighted.mean")
+importFrom("utils", "tail")
+
