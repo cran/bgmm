@@ -1,4 +1,4 @@
-b5bdb3b8953467bd401c5524e6f6bb7c *DESCRIPTION
+b526068713c4cbd6e019e054cdc411af *DESCRIPTION
 8cd6718f0834fe3a8e23c461086df336 *NAMESPACE
 586cfcb12e00dbbc36b5e4aba7fe6dcb *R/DEprobs.r
 8a0332795170cae8153f6f94cea602c1 *R/bgmm.e.step.r
@@ -9,7 +9,7 @@ cc2dc047b241bef96d792efaab151d4b *R/clusterAssigment.r
 a85bf17c4ba28da8deb2b5b55578ec8c *R/getModelSettings.r
 c2a5ba929e068afb3c4a9b4255b0e67b *R/getSimulatedKdimensionalData.r
 6dd53890ee019d0f4ddf86eea93ee361 *R/plot.bgmm.r
-2e49bec6e2f1a4742c720c60b148224b *R/plot.semiList.r
+fb00b44cc62f604af98f16aff4a4f44d *R/plot.semiList.r
 2044c22697cbe8e79fe02f948a9bee8c *R/semiList.r
 357a70cffc3d21d85f22b98ebe73fc20 *R/soft.e.step.r
 df41f394f82d18eee98ede150ed4d81a *R/soft.r
